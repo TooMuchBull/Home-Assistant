@@ -1,0 +1,18 @@
+alias: Verify Lights Off
+description: Turns off the specified lights and checks if they are all off
+fields:
+  light_entities:
+    description: List of light entities to turn off
+    example: "['light.light1', 'light.light2']"
+variables:
+  max_attempts: 2
+  interval: "00:00:30"
+sequence:
+  - service: script.verify_lights_loop
+    data:
+      attempt: 1
+      max_attempts: "{{ max_attempts }}"
+      light_entities: "{{ light_entities }}"
+      interval: "{{ interval }}"
+mode: parallel
+max: 3
