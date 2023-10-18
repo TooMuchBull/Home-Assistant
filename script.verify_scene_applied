@@ -1,0 +1,22 @@
+alias: Verify Scene Applied
+description: ""
+mode: parallel
+max: 3
+variables:
+  scene_entity_id: ""
+  max_retries: 2
+  retry_counter: 0
+sequence:
+  - service: script.verify_scene_applied_main
+    data:
+      scene_entity_id: "{{ scene_entity_id }}"
+      retry_counter: "{{ retry_counter }}"
+  - condition: template
+    value_template: "{{ not states('input_boolean.scene_match') }}"
+  - service: script.turn_on
+    target:
+      entity_id: script.verify_scene_applied
+    data:
+      variables:
+        scene_entity_id: "{{ scene_entity_id }}"
+        retry_counter: "{{ retry_counter + 1 }}"
