@@ -4,7 +4,7 @@ Some random scripts that I use in Home Assistant.  Some use the pyscript integra
 
 script.verify_scene_applied requires configuration.yaml changes as well as an input boolean (for me input_boolean.scene_match)
 
-configuration.yaml
+configuration.yaml additions:
 
 input_text:
   verify_scene_entity_id:
