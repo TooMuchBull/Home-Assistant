@@ -1,5 +1,7 @@
 # Home-Assistant
 
+Some random scripts that I use in Home Assistant.  Some use the pyscript integration and others are done in yaml.
+
 script.verify_scene_applied requires configuration.yaml changes as well as an input boolean (for me input_boolean.scene_match)
 
 configuration.yaml
