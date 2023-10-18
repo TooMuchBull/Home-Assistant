@@ -1,0 +1,61 @@
+alias: Verify Scene Applied Main
+description: ""
+mode: parallel
+max: 3
+variables:
+  scene_entity_id: ""
+  retry_counter: 0
+sequence:
+  - service: input_text.set_value
+    data:
+      entity_id: input_text.verify_scene_entity_id
+      value: "{{ scene_entity_id }}"
+  - variables:
+      states_match: >-
+        {{ (states | selectattr('entity_id', 'in',
+        expand(states('input_text.verify_scene_entity_id')) |
+        map(attribute='entity_id') | list) | map(attribute='state') | list) ==
+        (expand(states('input_text.verify_scene_entity_id')) |
+        map(attribute='state') | list) and (states | selectattr('entity_id',
+        'in', expand(states('input_text.verify_scene_entity_id')) |
+        map(attribute='entity_id') | list) |
+        map(attribute='attributes.brightness') | list) ==
+        (expand(states('input_text.verify_scene_entity_id')) |
+        map(attribute='attributes.brightness') | list) and (states |
+        selectattr('entity_id', 'in',
+        expand(states('input_text.verify_scene_entity_id')) |
+        map(attribute='entity_id') | list) |
+        map(attribute='attributes.color_mode') | list) ==
+        (expand(states('input_text.verify_scene_entity_id')) |
+        map(attribute='attributes.color_mode') | list) }}
+  - choose:
+      - conditions: "{{ states_match }}"
+        sequence:
+          - service: input_boolean.turn_on
+            target:
+              entity_id: input_boolean.scene_match
+            data: {}
+      - conditions: "{{ not states_match }}"
+        sequence:
+          - service: input_boolean.turn_off
+            target:
+              entity_id: input_boolean.scene_match
+            data: {}
+  - choose:
+      - conditions: "{{ not states_match }}"
+        sequence:
+          - service: scene.turn_on
+            target:
+              entity_id: "{{ scene_entity_id }}"
+          - delay:
+              seconds: 5
+  - service: system_log.write
+    data:
+      message: >-
+        Verify Scene Applied Main - Retry: {{ retry_counter }} - States match:
+        {{ states_match }}
+      level: info
+  - service: input_text.set_value
+    data:
+      entity_id: input_text.verify_scene_entity_id
+      value: ""
