@@ -1,8 +1,24 @@
 # Home-Assistant
 
-Some random scripts that I use in Home Assistant.  Some use the pyscript integration and others are done in yaml.
+Some random scripts that I use in Home Assistant.  Some use the python script integration and others are done in yaml.
 
-script.verify_scene_applied requires configuration.yaml changes as well as an input boolean (for me input_boolean.scene_match)
+add_plex_media_players.py
+
+Automatically adds new plex entities to media_player.plex_clients group
+
+check_unavailable_zigbee_devices.py
+
+Checks if any zigbee devices have been unavailable for 24 hours, paired with automation to send notification of any devices in the list to my phone.
+
+enable_timer_motion_automations.py
+
+"Resets" the automations in my home that can be manually disabled via buttons once per day
+
+
+
+script.verify_scene_applied 
+
+Requires configuration.yaml changes as well as an input boolean (for me input_boolean.scene_match)
 
 configuration.yaml additions:
 
