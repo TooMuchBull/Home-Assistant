@@ -1,0 +1,46 @@
+alias: Verify Lights Loop
+description: Handles the loop logic for the Verify Lights Off script
+fields:
+  attempt:
+    description: The current attempt number
+    example: 1
+  max_attempts:
+    description: The maximum number of attempts
+    example: 3
+  light_entities:
+    description: List of light entities to turn off
+    example: "['light.light1', 'light.light2']"
+  interval:
+    description: Time interval between attempts
+    example: "00:00:30"
+sequence:
+  - service: light.turn_off
+    target:
+      entity_id: "{{ light_entities }}"
+  - delay: "{{ interval }}"
+  - variables:
+      all_lights_off: |-
+        {% set ns = namespace(all_off=true) %}
+        {% for entity_id in light_entities %}
+          {% if not is_state(entity_id, 'off') %}
+            {% set ns.all_off = false %}
+          {% endif %}
+        {% endfor %}
+        {{ ns.all_off }}
+  - service: logbook.log
+    data:
+      name: Verify Lights Off - Details
+      message: >-
+        Attempt {{ attempt }}: {{ 'All lights off.' if all_lights_off else 'Some
+        lights still on. Retrying.' }} | Current States: {{ (light_entities |
+        map('states') | join(', ')) | to_json }}
+  - condition: template
+    value_template: "{{ not all_lights_off and attempt < max_attempts }}"
+  - service: script.verify_lights_loop
+    data:
+      attempt: "{{ attempt + 1 }}"
+      max_attempts: "{{ max_attempts }}"
+      light_entities: "{{ light_entities }}"
+      interval: "{{ interval }}"
+mode: parallel
+max: 3
